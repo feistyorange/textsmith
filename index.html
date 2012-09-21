@@ -26,7 +26,7 @@
 			specialcaps: true, //specialcaps
 			maxblanklines: true,
 			nmaxblanklines: 1,
-			suppressmultiplespaces: true,
+			onespace: true,
 			capfirstwords: true, //capitalize first words of sentences
 			debug: true, //turn debugging on
 		}
@@ -83,6 +83,19 @@
 			}
 			return dst;
 		}
+		
+		function oneSpace(input) {
+			var dst="",blankcount=0;
+			var src = input.split('\n');
+			if (config.debug)
+				console.log("Running oneSpace()");
+			
+			for (i=0;i<src.length;i++) {
+				src[i]=src[i].replace(/\s+/g," ");
+				dst += src[i]+"\n";
+			}			
+			return dst;
+		}
 
 		function doIt() {
 			if (config.debug)
@@ -97,13 +110,15 @@
 			config.specialcaps = document.getElementsByName('specialcaps')[0].checked;
 			config.maxblanklines = document.getElementsByName('maxblanklines')[0].checked;
 			config.nmaxblanklines = document.getElementsByName('nmaxblanklines')[0].value; //FIXME: sanity check!
+			config.onespace = document.getElementsByName('onespace')[0].checked;
 			config.debug = document.getElementsByName('debug')[0].checked;
 			
 			if (config.specialcaps)
 				text = specialCaps(text);
-				
 			if (config.maxblanklines)
 				text = maxBlankLines(text);
+			if (config.onespace)
+				text = oneSpace(text);
 			
 			f2.value = trim(text); //trim and send output out
 
@@ -113,24 +128,25 @@
     </script>
   </head>
   <body>
-    <textarea id="f1" rows=20 cols=40 onkeyup="javascript:doIt()">google has offices in new york and london.
+    <textarea id="f1" rows=20 cols=40 onkeyup="javascript:doIt()">google   has offices in new york and london.
     
     
     
     
     
-this is the new iphone 5!
+this is a javascript application!
 </textarea>
     <textarea id="f2" rows=20 cols=40></textarea>
     <div id="specialcaps"> Special caps rules: <br /> <textarea id="scrules" rows=10 cols=30 onkeyup="javascript:doIt()">
 New York
 London
 Google
-iPhone</textarea> </div>
+JavaScript</textarea> </div>
 		<div id="controlpanel">
 			<input type="checkbox" name="specialcaps" checked>Special Caps</input> <br />
 			<input type="checkbox" name="maxblanklines" checked /> <input type="text" name="nmaxblanklines" value="1" size=2 maxlength=2 /> Max blank lines <br />
-			<input type="checkbox" name="debug" checked>Debug (send debug output to console)</input> <br />
+			<input type="checkbox" name="onespace" checked>One Space: suppresses multiple (white)spaces per line with one space</input> <br />
+			<input type="checkbox" name="debug" checked>Debug: send debug output to console</input> <br />
 			<button onClick="javascript:doIt()">Do it!</button>
 		</div>
 		<div id="footer">Textsmith is an open source text cleaning and manipulation tool for cleaning up of dirty text. You can find our source code <a href="https://github.com/feistyorange/textsmith">here</a>.<br />
