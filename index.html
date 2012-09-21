@@ -86,7 +86,8 @@
 		}
 		
 		function oneSpace(input) { //FIXME: possible to do with one input.replace()? What is the regex for all whitespace except newlines?
-			var dst="",blankcount=0;
+			//FIXME: rename to fixSpace? E.g. ensure one space after period, no spaces at start of line?
+			/* var dst="",blankcount=0;
 			var src = input.split('\n');
 			if (config.debug)
 				console.log("Running oneSpace()");
@@ -95,7 +96,8 @@
 				src[i]=src[i].replace(/\s+/g," ");
 				dst += src[i]+"\n";
 			}			
-			return dst;
+			return dst; */
+			return input.replace(/[ \t]+/g," ");
 		}
 		
 		function unwrapP(input) { //FIXME: currently merges all paragraphs too.
@@ -155,7 +157,7 @@ JavaScript</textarea> </div>
 			<input type="checkbox" name="specialcaps" checked>Special Caps</input> <br />
 			<input type="checkbox" name="maxblanklines" checked /> <input type="text" name="nmaxblanklines" value="1" size=2 maxlength=2 /> Max blank lines <br />
 			<input type="checkbox" name="onespace" checked>One Space: suppresses multiple (white)spaces with one space</input> <br />
-			<input type="checkbox" name="unwrapp" checked>Unwrap paragraphs</input> <br />
+			<input type="checkbox" name="unwrapp">Unwrap paragraphs</input> <br />
 			<input type="checkbox" name="debug" checked>Debug: send debug output to console</input> <br />
 			<button onClick="javascript:doIt()">Do it!</button>
 		</div>
