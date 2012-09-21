@@ -3,14 +3,67 @@
   <head>
     <meta charset=utf-8>
     <title>textsmith</title>
-    <script src="libs/jquery-1.7.1.min.js"></script>
+    <style type="text/css">
+    	#input {
+    		float:left;
+    		margin-right:10px; }
+    	#output {
+    		float:left;
+    		margin-right:20px; }
+    </style>
+<!--    <script src="libs/jquery-1.7.1.min.js"></script> -->
     <script>
-    $(function(){
-      $('#helloworld').hide().text('hello, world').fadeIn();
-    });
+		function trim(stringToTrim) {
+			return stringToTrim.replace(/^\s+|\s+$/g,"");
+		}
+
+		function doIt() {
+			console.time("doIt");
+			var src, dst="", line, s, d;
+			var f1 = document.getElementById('f1');
+			var f2 = document.getElementById('f2');
+			var debug = document.getElementById('debug');
+			var rrulestext = document.getElementById('rrules').value.split(/[\n,]/);
+			var rrulesarray = new Array();
+			
+			for (i=0;i<rrulestext.length;i++) { //load replacement rules
+				if (rrulestext[i]!="") {
+					rrulestext[i] = trim(rrulestext[i]);
+					rrulesarray[i] = new RegExp("\\b"+rrulestext[i]+"\\b","gi")
+				} else {
+					rrulestext.splice(i,1);
+					i--;
+				}
+			}
+			
+			console.log(rrulestext);
+			console.log(rrulesarray);
+			
+			src=f1.value.toLowerCase().split('\n');
+			for (i=0;i<src.length;i++) { //line by line check
+				line = src[i];
+				for (j=0;j<rrulestext.length;j++) {
+					line = line.replace(rrulesarray[j],rrulestext[j]);
+				}
+				dst += line+'\n';;
+			}
+			f2.value = trim(dst);
+			console.timeEnd("doIt");
+		}
     </script>
   </head>
   <body>
-    <div id=helloworld>initial</div>
+    <textarea id="f1" rows=20 cols=40 onkeyup="javascript:doIt()">Google has offices in New York and london.
+This is my new kia!
+</textarea>
+    <textarea id="f2" rows=20 cols=40>output</textarea>
+    <textarea id="rrules" rows=10 cols=30 onkeyup="javascript:doIt()">
+New York
+London
+Google
+Kia</textarea>
+<button onClick="javascript:doIt()">Do it!</button>
+    <div id="footer">textsmith is an open source text cleaning and manipulation tool for cleaning up of dirty text. You can find our source code <a href="https://github.com/feistyorange/textsmith">here</a>.<br />
+    Kindly send all feedback to <a href="mailto:lijie@eccentri.cc">lijie@eccentri.cc</a>. Thank you!</div>
   </body>
 </html>
