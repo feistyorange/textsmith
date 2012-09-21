@@ -2,68 +2,138 @@
 <html lang=en>
   <head>
     <meta charset=utf-8>
-    <title>textsmith</title>
+    <title>Textsmith</title>
     <style type="text/css">
     	#input {
-    		float:left;
-    		margin-right:10px; }
+    		float: left;
+    		margin-right: 10px; }
     	#output {
-    		float:left;
-    		margin-right:20px; }
+    		float: left;
+    		margin-right: 20px; }
+    	#specialcaps {
+    		float: right; }
     </style>
 <!--    <script src="libs/jquery-1.7.1.min.js"></script> -->
     <script>
-		function trim(stringToTrim) {
-			return stringToTrim.replace(/^\s+|\s+$/g,"");
+		function trim(str) {
+			if (str)
+				return str.replace(/^\s*|\s*$/g,"");
+			else
+				return "";
 		}
-
-		function doIt() {
-			console.time("doIt");
-			var src, dst="", line, s, d;
-			var f1 = document.getElementById('f1');
-			var f2 = document.getElementById('f2');
-			var debug = document.getElementById('debug');
-			var rrulestext = document.getElementById('rrules').value.split(/[\n,]/);
-			var rrulesarray = new Array();
+		
+		var config = {
+			specialcaps: true, //specialcaps
+			maxblanklines: true,
+			nmaxblanklines: 1,
+			suppressmultiplespaces: true,
+			capfirstwords: true, //capitalize first words of sentences
+			debug: true, //turn debugging on
+		}
+		
+		function specialCaps(input) {
+			var dst="", line;
+			var src = input.split('\n');
+			var scrulestext = document.getElementById('scrules').value.split(/[\n,]/);
+			var scrulesarray = [];
 			
-			for (i=0;i<rrulestext.length;i++) { //load replacement rules
-				if (rrulestext[i]!="") {
-					rrulestext[i] = trim(rrulestext[i]);
-					rrulesarray[i] = new RegExp("\\b"+rrulestext[i]+"\\b","gi")
+			if (config.debug)
+				console.log("Running specialCaps()");
+			
+			for (i=0;i<scrulestext.length;i++) { //load specialcaps rules
+				if (scrulestext[i]!="") {
+					scrulestext[i] = trim(scrulestext[i]);
+					scrulesarray[i] = new RegExp("\\b"+scrulestext[i]+"\\b","gi")
 				} else {
-					rrulestext.splice(i,1);
+					scrulestext.splice(i,1);
 					i--;
 				}
 			}
-			
-			console.log(rrulestext);
-			console.log(rrulesarray);
-			
-			src=f1.value.toLowerCase().split('\n');
+			if (config.debug) {
+				console.log(scrulestext);
+				console.log(scrulesarray);
+			}
+
 			for (i=0;i<src.length;i++) { //line by line check
 				line = src[i];
-				for (j=0;j<rrulestext.length;j++) {
-					line = line.replace(rrulesarray[j],rrulestext[j]);
+				for (j=0;j<scrulestext.length;j++) {
+					line = line.replace(scrulesarray[j],scrulestext[j]);
 				}
 				dst += line+'\n';;
 			}
-			f2.value = trim(dst);
-			console.timeEnd("doIt");
+			return dst;
+		}
+		
+		function maxBlankLines(input) {
+			var dst="",blankcount=0;
+			var src = input.split('\n');
+			if (config.debug)
+				console.log("Running maxBlankLines()");
+			
+			for (i=0;i<src.length;i++) {
+				if (trim(src[i])==="") {
+					if (blankcount<config.nmaxblanklines) {
+						dst += "\n";
+						blankcount++;
+					}
+				} else {
+					dst += src[i]+"\n";
+					blankcount = 0;
+				}
+			}
+			return dst;
+		}
+
+		function doIt() {
+			if (config.debug)
+				console.profile();
+			var src, dst="", line, s, d;
+			var f1 = document.getElementById('f1');
+			var f2 = document.getElementById('f2');
+			
+			var text = f1.value;
+			
+			//load config
+			config.specialcaps = document.getElementsByName('specialcaps')[0].checked;
+			config.maxblanklines = document.getElementsByName('maxblanklines')[0].checked;
+			config.nmaxblanklines = document.getElementsByName('nmaxblanklines')[0].value; //FIXME: sanity check!
+			config.debug = document.getElementsByName('debug')[0].checked;
+			
+			if (config.specialcaps)
+				text = specialCaps(text);
+				
+			if (config.maxblanklines)
+				text = maxBlankLines(text);
+			
+			f2.value = trim(text); //trim and send output out
+
+			if (config.debug)
+				console.profileEnd();
 		}
     </script>
   </head>
   <body>
-    <textarea id="f1" rows=20 cols=40 onkeyup="javascript:doIt()">Google has offices in New York and london.
-This is my new kia!
+    <textarea id="f1" rows=20 cols=40 onkeyup="javascript:doIt()">google has offices in new york and london.
+    
+    
+    
+    
+    
+this is the new iphone 5!
 </textarea>
-    <textarea id="f2" rows=20 cols=40>output</textarea>
-    <textarea id="rrules" rows=10 cols=30 onkeyup="javascript:doIt()">
+    <textarea id="f2" rows=20 cols=40></textarea>
+    <div id="specialcaps"> Special caps rules: <br /> <textarea id="scrules" rows=10 cols=30 onkeyup="javascript:doIt()">
 New York
 London
 Google
-Kia</textarea>
-<button onClick="javascript:doIt()">Do it!</button>
-    <div id="footer">textsmith is an open source text cleaning and manipulation tool for cleaning up of dirty text. You can find our source code <a href="https://github.com/feistyorange/textsmith">here</a>.<br />
-    Kindly send all feedback to <a href="mailto:lijie@eccentri.cc">lijie@eccentri.cc</a>. Thank you!</div>
+iPhone</textarea> </div>
+		<div id="controlpanel">
+			<input type="checkbox" name="specialcaps" checked>Special Caps</input> <br />
+			<input type="checkbox" name="maxblanklines" checked /> <input type="text" name="nmaxblanklines" value="1" size=2 maxlength=2 /> Max blank lines <br />
+			<input type="checkbox" name="debug" checked>Debug (send debug output to console)</input> <br />
+			<button onClick="javascript:doIt()">Do it!</button>
+		</div>
+		<div id="footer">Textsmith is an open source text cleaning and manipulation tool for cleaning up of dirty text. You can find our source code <a href="https://github.com/feistyorange/textsmith">here</a>.<br />
+		Kindly send all feedback to <a href="mailto:lijie@eccentri.cc">lijie@eccentri.cc</a>. Thank you!</div>
   </body>
 </html>
