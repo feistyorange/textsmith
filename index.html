@@ -27,6 +27,7 @@
 			maxblanklines: true,
 			nmaxblanklines: 1,
 			onespace: true,
+			unwrapp: true, //re-form paragraph, e.g. http://pastebin.com/bg0x7GwH
 			capfirstwords: true, //capitalize first words of sentences
 			debug: true, //turn debugging on
 		}
@@ -84,7 +85,7 @@
 			return dst;
 		}
 		
-		function oneSpace(input) { //FIXME: possible to do with one input.replace()?
+		function oneSpace(input) { //FIXME: possible to do with one input.replace()? What is the regex for all whitespace except newlines?
 			var dst="",blankcount=0;
 			var src = input.split('\n');
 			if (config.debug)
@@ -95,6 +96,11 @@
 				dst += src[i]+"\n";
 			}			
 			return dst;
+		}
+		
+		function unwrapP(input) { //FIXME: currently merges all paragraphs too.
+			return input.replace(/[ \t]*\n[ \t]*/g,"\1 \2");
+			//return input.replace(/\S[ \t]*\n[ \t]*\S/g,"\1 \2"); <--not sure how to capture those \S chars
 		}
 
 		function doIt() {
@@ -111,6 +117,7 @@
 			config.maxblanklines = document.getElementsByName('maxblanklines')[0].checked;
 			config.nmaxblanklines = document.getElementsByName('nmaxblanklines')[0].value; //FIXME: sanity check!
 			config.onespace = document.getElementsByName('onespace')[0].checked;
+			config.unwrapp = document.getElementsByName('unwrapp')[0].checked;
 			config.debug = document.getElementsByName('debug')[0].checked;
 			
 			if (config.specialcaps)
@@ -119,6 +126,8 @@
 				text = maxBlankLines(text);
 			if (config.onespace)
 				text = oneSpace(text);
+			if (config.unwrapp)
+				text = unwrapP(text);
 			
 			f2.value = trim(text); //trim and send output out
 
@@ -146,6 +155,7 @@ JavaScript</textarea> </div>
 			<input type="checkbox" name="specialcaps" checked>Special Caps</input> <br />
 			<input type="checkbox" name="maxblanklines" checked /> <input type="text" name="nmaxblanklines" value="1" size=2 maxlength=2 /> Max blank lines <br />
 			<input type="checkbox" name="onespace" checked>One Space: suppresses multiple (white)spaces with one space</input> <br />
+			<input type="checkbox" name="unwrapp" checked>Unwrap paragraphs</input> <br />
 			<input type="checkbox" name="debug" checked>Debug: send debug output to console</input> <br />
 			<button onClick="javascript:doIt()">Do it!</button>
 		</div>
