@@ -37,9 +37,6 @@
 			var scrulestext = document.getElementById('scrules').value.split(/[\n,]/);
 			var scrulesarray = [];
 			
-			if (config.debug)
-				console.log("Running specialCaps()");
-			
 			for (i=0;i<scrulestext.length;i++) { //load specialcaps rules
 				if (scrulestext[i]!="") {
 					scrulestext[i] = trim(scrulestext[i]);
@@ -67,9 +64,7 @@
 		function maxBlankLines(input) {
 			var dst="",blankcount=0;
 			var src = input.split('\n');
-			if (config.debug)
-				console.log("Running maxBlankLines()");
-			
+
 			for (i=0;i<src.length;i++) {
 				if (trim(src[i])==="") {
 					if (blankcount<config.nmaxblanklines) {
@@ -85,16 +80,7 @@
 		}
 		
 		function oneSpace(input) {
-			var dst="",blankcount=0;
-			var src = input.split('\n');
-			if (config.debug)
-				console.log("Running oneSpace()");
-			
-			for (i=0;i<src.length;i++) {
-				src[i]=src[i].replace(/\s+/g," ");
-				dst += src[i]+"\n";
-			}			
-			return dst;
+			return input.replace(/^[\s]+$/g," ");
 		}
 
 		function doIt() {
