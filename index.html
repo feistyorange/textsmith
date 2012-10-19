@@ -28,7 +28,7 @@
 			nmaxblanklines: 1,
 			onespace: true,
 			unwrapp: true, //re-form paragraph, e.g. http://pastebin.com/bg0x7GwH
-			capfirstwords: true, //capitalize first words of sentences
+			startcap: true, //capitalize first word of each sentence/line
 			debug: true, //turn debugging on
 		}
 		
@@ -104,6 +104,16 @@
 			return input.replace(/[ \t]*\n[ \t]*/g,"\1 \2");
 			//return input.replace(/\S[ \t]*\n[ \t]*\S/g,"\1 \2"); <--not sure how to capture those \S chars
 		}
+		
+		function startCap(input) {
+			var dst="";
+			var src = input.split('\n');
+			for (i=0;i<src.length;i++) {
+				src[i] = src[i].substr(0,1).toUpperCase()+src[i].substr(1);
+				dst += src[i]+"\n";
+			}
+			return dst;
+		}
 
 		function doIt() {
 			if (config.debug)
@@ -120,8 +130,11 @@
 			config.nmaxblanklines = document.getElementsByName('nmaxblanklines')[0].value; //FIXME: sanity check!
 			config.onespace = document.getElementsByName('onespace')[0].checked;
 			config.unwrapp = document.getElementsByName('unwrapp')[0].checked;
+			config.startcap = document.getElementsByName('startcap')[0].checked;
 			config.debug = document.getElementsByName('debug')[0].checked;
 			
+			if (config.startcap)
+				text = startCap(text);
 			if (config.specialcaps)
 				text = specialCaps(text);
 			if (config.maxblanklines)
@@ -158,6 +171,7 @@ JavaScript</textarea> </div>
 			<input type="checkbox" name="maxblanklines" checked /> <input type="text" name="nmaxblanklines" value="1" size=2 maxlength=2 /> Max blank lines <br />
 			<input type="checkbox" name="onespace" checked>One Space: suppresses multiple (white)spaces with one space</input> <br />
 			<input type="checkbox" name="unwrapp">Unwrap paragraphs</input> <br />
+			<input type="checkbox" name="startcap" checked>Start each line/sentence with a capital letter</input> <br />
 			<input type="checkbox" name="debug" checked>Debug: send debug output to console</input> <br />
 			<button onClick="javascript:doIt()">Do it!</button>
 		</div>
